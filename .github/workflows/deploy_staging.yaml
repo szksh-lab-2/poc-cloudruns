@@ -1,0 +1,16 @@
+name: Deploy staging
+on:
+  workflow_dispatch:
+    inputs:
+      path:
+        required: true
+      ref:
+        required: true
+jobs:
+  deploy:
+    uses: szksh-lab-2/poc-cloudruns/.github/workflows/wc_deploy_staging.yaml@main
+    with:
+      path: ${{inputs.path}}
+      ref: ${{inputs.ref}}
+    permissions:
+      contents: read

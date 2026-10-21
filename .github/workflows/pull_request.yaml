@@ -1,0 +1,26 @@
+name: Test
+on:
+  pull_request:
+    branches:
+      - dummy # main
+concurrency:
+  group: ${{ github.workflow }}--${{ github.ref }}
+  cancel-in-progress: true
+permissions: {}
+jobs:
+  test:
+    uses: $/.github/workflows/wc_pull_request.yaml
+    permissions:
+      contents: read
+      pull-requests: read
+      id-token: write
+  status-check:
+    runs-on: ubuntu-26.04
+    # https://github.com/aquaproj/aqua-registry/pull/38449#issuecomment-3038859524
+    if: always() && (contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled'))
+    timeout-minutes: 5
+    permissions: {}
+    needs:
+      - test
+    steps:
+      - run: exit 1

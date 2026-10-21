@@ -1,0 +1,42 @@
+on:
+  workflow_call:
+    inputs:
+      service:
+        required: false
+        type: string
+permissions: {}
+jobs:
+  download:
+    # Download dependencies and upload them to GitHub Artifacts
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - run: make dep
+
+  test:
+    runs-on: ubuntu-26.04
+    timeout-minutes: 30
+    permissions: {}
+    needs:
+      - download
+    outputs:
+      fix: ${{steps.fix.outputs.value}}
+    steps:
+      - run: make fix
+        id: fix
+      - run: make test
+
+  fix:
+    # Fix via Securefix Action
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+    if: needs.test.outputs.fix == 'true'
+    permissions:
+      id-token: write
+    needs:
+      - test
+    steps:
+      - run: exit 1

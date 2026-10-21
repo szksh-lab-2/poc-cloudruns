@@ -1,0 +1,36 @@
+name: Create a release PR
+on:
+  workflow_dispatch:
+    inputs:
+      path:
+        required: true
+jobs:
+  create:
+    runs-on: ubuntu-26.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      # Update SHA in env.yaml and create a pull request via Securefix Action
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: csm-actions/securefix-action@ada5710dddfb54a0a55109e320830a757472ce04 # v0.6.4
+        with:
+          app_id: ${{ vars.SECUREFIX_CLIENT_APP_ID }}
+          app_private_key: ${{ secrets.SECUREFIX_CLIENT_PRIVATE_KEY }}
+          # aws_kms_key_id: ${{ vars.SECUREFIX_CLIENT_KMS_KEY_ID }}
+          # aws_role_to_assume: ${{ vars.SECUREFIX_CLIENT_ROLE_TO_ASSUME }}
+          server_repository: securefix-action-server
+          branch: ${{ steps.param.outputs.branch }}
+          commit_message: "Release ${{ inputs.path }}"
+          pull_request_base_branch: main
+          pull_request_title: "Release ${{ inputs.path }}"
+          pull_request_body: ${{ steps.param.outputs.pr_body }}
+          pull_request_assignees: ${{ github.actor }}
+          pull_request_reviewers: ${{ github.actor }}
+          pull_request_draft: true
+          pull_request_comment: |
+            @${{ github.actor }} created this pull request using [the GitHub Actions](${{steps.param.outputs.run_url}}).

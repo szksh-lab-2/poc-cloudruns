@@ -1,0 +1,25 @@
+on: workflow_call
+permissions: {}
+jobs:
+  list:
+    # Output the list of changed functions
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+    permissions: {}
+    outputs:
+      services: ${{steps.services.outputs.value}}
+    steps:
+      - run: exit 1
+        id: services
+
+  test:
+    uses: ./.github/workflows/wc_test.yaml
+    needs:
+      - list
+    permissions:
+      id-token: write
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        service: ${{fromJSON(needs.list.outputs.services)}}
