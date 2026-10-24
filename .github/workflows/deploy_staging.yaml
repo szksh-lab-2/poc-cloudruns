@@ -8,7 +8,7 @@ on:
         required: true
 jobs:
   deploy:
-    uses: szksh-lab-2/poc-cloudruns/.github/workflows/wc_deploy_staging.yaml@main
+    uses: szksh-lab-2/poc-cloudruns/.github/workflows/wc_deploy_staging.yaml@6319877492d95f5d2979dfa86f7f08670583fa23 # main
     with:
       path: ${{inputs.path}}
       ref: ${{inputs.ref}}
